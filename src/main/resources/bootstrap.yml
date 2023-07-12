@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/user_system?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    password:
+    connect-timeout: 5000
+mybatis:
+  mapper-locations: classpath:mapper/*/*.xml
+
+logging:
+  level:
+    com.example.wutao920157: debug
+
+token:
+  publicKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAM4xQ0/nzoyyc4I21OyHYWkJXp3zqjKT5CBNc8IL8j1o1ER6UqdL+b52mQ/wZ30yOOka5Z6rKealHVBZIncRosUCAwEAAQ==
+  privateKey: MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAzjFDT+fOjLJzgjbU7IdhaQlenfOqMpPkIE1zwgvyPWjURHpSp0v5vnaZD/BnfTI46Rrlnqsp5qUdUFkidxGixQIDAQABAkB7LhL4eZN7mmBHOlqZs4cOKPrNgfP7oz51zc+J7XkaFaIt0MYp69OVushedliv0K4ulUFwJP2WAnZ7x1O9TSFBAiEA/2CP7ovIYCycJOQapXKBOaYcHhceaKmiAd8h+ATCBPcCIQDOsf5Y1+r6ilTegdbcrdWFmIzZspxAzNyGr+VbljBzIwIgGC/OEfq9NJalBz1vZKIOqSYZXaQ05hbC2EiI0BOrSIsCIQCUkPei4D+zqa5q6KSJpiEtj4LeDzWklhuEa/XNqNxWRQIhAPD5yAvCL+fzPz0YVCRAJE2idOxVpFb5mxkraVlKgLnQ
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql

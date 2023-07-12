@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.wutao920157.dao.UserDao">
+
+    <resultMap id="BaseResultMap" type="com.example.wutao920157.bean.entity.UserDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="TINYINT"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="platform_id" property="platformId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="create_id" property="createId" jdbcType="INTEGER"/>
+        <result column="update_id" property="updateId" jdbcType="INTEGER"/>
+        <result column="is_del" property="isDel" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="selectUserList" resultMap="BaseResultMap">
+        select id, username, age, address, platform_id, salt, password
+        from u_user
+        where is_del = 0
+        <if test="username != null and username != ''">and username=#{username}</if>
+        <if test="age != null">and age=#{age}</if>
+        <if test="address != null and address != ''">and address like concat('%', #{address}, '%')</if>
+        <if test="password != null and password != ''">and password=#{password}</if>
+        order by id desc
+    </select>
+
+    <select id="selectUserDetail" resultMap="BaseResultMap">
+        select id, username, age, address, platform_id
+        from u_user
+        where id = #{id} and is_del = 0
+        limit 1
+    </select>
+
+    <update id="updateUserDetail">
+        update u_user set age = #{age}, address = #{address} where id = #{id}
+    </update>
+
+    <select id="countByUsername" resultType="java.lang.Integer" >
+        select count(*) from u_user where username = #{username} and is_del = 0
+    </select>
+    <insert id="insertUser">
+        insert u_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="age != null">age,</if>
+            <if test="address != null">address,</if>
+            <if test="platformId != null">platform_id,</if>
+            <if test="salt != null">salt,</if>
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null">#{username},</if>
+            <if test="password != null">#{password},</if>
+            <if test="age != null">#{age},</if>
+            <if test="address != null">#{address},</if>
+            <if test="platformId != null">#{platformId},</if>
+            <if test="salt != null">#{salt},</if>
+        </trim>
+    </insert>
+</mapper>
