@@ -54,12 +54,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserListResponseDTO listPage(UserListDTO userListDto){
-
         PageHelper.startPage(userListDto.getPageNo(), userListDto.getPageSize());
         List<UserDO> userDOS = userDao.selectUserList(userListDto);
 
         PageInfo<UserDO> pageInfo = new PageInfo<>(userDOS);
-
         UserListResponseDTO userListResponseDTO = UserListMapping.buildUserListResponseDTO(pageInfo.getList());
         userListResponseDTO.setTotalNum(pageInfo.getTotal());
         return userListResponseDTO;
@@ -72,17 +70,24 @@ public class UserServiceImpl implements UserService {
             throw  new BizException(ErrorEnum.NOT_FOUND_USER.code(), ErrorEnum.NOT_FOUND_USER.message());
 //            throw  new BizException(ErrorEnum.NOT_FOUND_USER.code(), ErrorEnum.NOT_FOUND_USER.message());
         }
+
+        return buildUserItemResponseDTO(userSingleList);
+    }
+
+    /**
+     * 构建UserItemResponseDTO
+     * @param userSingleList
+     * @return
+     */
+    private UserItemResponseDTO buildUserItemResponseDTO(List<UserDO> userSingleList){
         UserItemResponseDTO userItemResponseDTO = new UserItemResponseDTO();
-        // 默认平台A
-        Integer platformId = 1;
-        for (UserDO userDO : userSingleList){
-            userItemResponseDTO.setId(userDO.getId());
-            userItemResponseDTO.setUsername(userDO.getUsername());
-            userItemResponseDTO.setAge(userDO.getAge());
-            userItemResponseDTO.setAddress(userDO.getAddress());
-            platformId = userDO.getPlatformId();
-        }
-        // 获取平台名称
+        UserDO userDO = userSingleList.get(0);
+        userItemResponseDTO.setId(userDO.getId());
+        userItemResponseDTO.setUsername(userDO.getUsername());
+        userItemResponseDTO.setAge(userDO.getAge());
+        userItemResponseDTO.setAddress(userDO.getAddress());
+
+        int platformId = userDO.getPlatformId();
         Map<Integer, String> platformMap = platformService.mapName();
         String platform = Objects.isNull(platformMap.get(platformId)) ? "" : platformMap.get(platformId);
         userItemResponseDTO.setPlatfrom(platform);
@@ -114,6 +119,33 @@ public class UserServiceImpl implements UserService {
         String username = userRegisterDTO.getUsername();
         String password = userRegisterDTO.getPassword();
 
+        checkRegister(userRegisterDTO, password, username);
+
+        String salt = StringCharUtil.getRandomString(5);
+        String savePassword = generateSavePassword(password, salt);
+        // 组装DO
+        UserBuildDTO userBuildDTO = new UserBuildDTO();
+        userBuildDTO.setUsername(username);
+        userBuildDTO.setPassword(savePassword);
+        userBuildDTO.setPlatformId(userRegisterDTO.getPlatformId());
+        userBuildDTO.setSalt(salt);
+        UserDO userDO = buildUserDO(userBuildDTO);
+
+        // 插入数据库
+        Integer insertCount = userDao.insertUser(userDO);
+        if (insertCount == 0){
+            throw  new BizException(ErrorEnum.ERROR_REGISTER_FAIL.code(), ErrorEnum.ERROR_REGISTER_FAIL.message());
+        }
+        return null;
+    }
+
+    /**
+     * 检查注册参数
+     * @param userRegisterDTO
+     * @param password
+     * @param username
+     */
+    private void checkRegister(UserRegisterDTO userRegisterDTO, String password, String username){
         // 判断密码和重复密码是否相同
         if (!password.equals(userRegisterDTO.getRepeatPassword())){
             throw  new BizException(ErrorEnum.NOT_SAME_PASSWORD.code(), ErrorEnum.NOT_SAME_PASSWORD.message());
@@ -133,23 +165,6 @@ public class UserServiceImpl implements UserService {
         if(haveSensitiveWord){
             throw  new BizException(ErrorEnum.ERROR_ABOUT_SENSITIVE_WORD.code(), ErrorEnum.ERROR_ABOUT_SENSITIVE_WORD.message());
         }
-        String salt = StringCharUtil.getRandomString(5);
-        String savePassword = generateSavePassword(password, salt);
-        // 组装DO
-        UserBuildDTO userBuildDTO = new UserBuildDTO();
-        userBuildDTO.setUsername(username);
-        userBuildDTO.setPassword(savePassword);
-        userBuildDTO.setPlatformId(userRegisterDTO.getPlatformId());
-        userBuildDTO.setSalt(salt);
-        UserDO userDO = buildUserDO(userBuildDTO);
-
-        // 插入数据库
-        Integer insertCount = userDao.insertUser(userDO);
-
-        if (insertCount == 0){
-            throw  new BizException(ErrorEnum.ERROR_REGISTER_FAIL.code(), ErrorEnum.ERROR_REGISTER_FAIL.message());
-        }
-        return null;
     }
 
     /**
@@ -188,6 +203,7 @@ public class UserServiceImpl implements UserService {
         // 增加日志记录
         LogInsertDTO logInsertDTO = new LogInsertDTO();
         logInsertDTO.setUsername(username);
+        // todo
         logInsertDTO.setContent("登录系统");
         logInsertDTO.setAddress(userLoginDTO.getIpAddress());
         logService.insertLog(logInsertDTO);
