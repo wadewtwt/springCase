@@ -14,7 +14,7 @@ mybatis:
 
 logging:
   level:
-    com.example.wutao920157: debug
+    com.example.springCase: debug
 
 token:
   publicKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAM4xQ0/nzoyyc4I21OyHYWkJXp3zqjKT5CBNc8IL8j1o1ER6UqdL+b52mQ/wZ30yOOka5Z6rKealHVBZIncRosUCAwEAAQ==

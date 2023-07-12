@@ -1,9 +1,9 @@
-package com.example.wutao920157.service;
+package com.example.springCase.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.example.wutao920157.Application;
-import com.example.wutao920157.bean.dto.LogInsertDTO;
-import com.example.wutao920157.bean.dto.LogListDTO;
+import com.example.springCase.Application;
+import com.example.springCase.bean.dto.LogInsertDTO;
+import com.example.springCase.bean.dto.LogListDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
